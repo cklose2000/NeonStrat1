@@ -35,17 +35,33 @@ CREATE TABLE bars (
     bar_id BIGSERIAL,
     instrument_id INTEGER NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-    timeframe VARCHAR(5) NOT NULL, -- 1m, 5m, 15m, 1h, 1d
+    timeframe VARCHAR(10) NOT NULL, -- Changed from VARCHAR(5) to VARCHAR(10)
     open NUMERIC(15, 8) NOT NULL,
     high NUMERIC(15, 8) NOT NULL,
     low NUMERIC(15, 8) NOT NULL,
     close NUMERIC(15, 8) NOT NULL,
-    volume INTEGER NOT NULL,
+    volume BIGINT NOT NULL,
     vwap NUMERIC(15, 8),
     trades INTEGER,
     PRIMARY KEY (bar_id, timestamp, timeframe),
     FOREIGN KEY (instrument_id) REFERENCES instruments(instrument_id)
 ) PARTITION BY LIST (timeframe);
+
+-- Create partitions for different timeframes
+CREATE TABLE bars_5m PARTITION OF bars FOR VALUES IN ('5m');
+CREATE TABLE bars_15m PARTITION OF bars FOR VALUES IN ('15m');
+CREATE TABLE bars_30m PARTITION OF bars FOR VALUES IN ('30m');
+CREATE TABLE bars_60m PARTITION OF bars FOR VALUES IN ('60m');
+CREATE TABLE bars_daily PARTITION OF bars FOR VALUES IN ('daily');
+CREATE TABLE bars_weekly PARTITION OF bars FOR VALUES IN ('weekly');
+
+-- Create indexes on partitions
+CREATE INDEX idx_bars_5m_instrument_time ON bars_5m (instrument_id, timestamp);
+CREATE INDEX idx_bars_15m_instrument_time ON bars_15m (instrument_id, timestamp);
+CREATE INDEX idx_bars_30m_instrument_time ON bars_30m (instrument_id, timestamp);
+CREATE INDEX idx_bars_60m_instrument_time ON bars_60m (instrument_id, timestamp);
+CREATE INDEX idx_bars_daily_instrument_time ON bars_daily (instrument_id, timestamp);
+CREATE INDEX idx_bars_weekly_instrument_time ON bars_weekly (instrument_id, timestamp);
 
 -- Trading strategies
 CREATE TABLE strategies (
@@ -92,7 +108,7 @@ CREATE TABLE backtest_sessions (
     instrument_id INTEGER NOT NULL,
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    timeframe VARCHAR(5) NOT NULL,
+    timeframe VARCHAR(10) NOT NULL, -- Changed from VARCHAR(5) to VARCHAR(10)
     initial_capital NUMERIC(15, 2) NOT NULL,
     commission_model JSONB,
     slippage_model JSONB,
@@ -215,5 +231,4 @@ CREATE TABLE audit_trails (
 );
 
 -- Create indexes for fast time range queries
-CREATE INDEX idx_tick_data_instrument_time ON tick_data(instrument_id, timestamp);
-CREATE INDEX idx_bars_instrument_time ON bars(instrument_id, timestamp, timeframe); 
+CREATE INDEX idx_tick_data_instrument_time ON tick_data(instrument_id, timestamp); 

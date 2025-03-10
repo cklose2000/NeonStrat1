@@ -1,3 +1,5 @@
+"""Database initialization script."""
+
 import os
 import psycopg2
 from dotenv import load_dotenv
@@ -31,6 +33,39 @@ def init_database():
         
         # Connect to database
         conn = psycopg2.connect(**db_config)
+        
+        # Drop existing tables
+        with conn:
+            cursor = conn.cursor()
+            try:
+                logger.info("Dropping existing tables...")
+                cursor.execute("""
+                    DROP TABLE IF EXISTS 
+                        audit_trails,
+                        system_logs,
+                        performance_metrics,
+                        positions,
+                        portfolio_snapshots,
+                        trades,
+                        orders,
+                        backtest_sessions,
+                        parameter_sets,
+                        strategy_parameters,
+                        strategies,
+                        bars_5m,
+                        bars_15m,
+                        bars_30m,
+                        bars_60m,
+                        bars_daily,
+                        bars_weekly,
+                        bars,
+                        tick_data,
+                        instruments
+                    CASCADE
+                """)
+                logger.info("Existing tables dropped successfully.")
+            finally:
+                cursor.close()
         
         # Read schema file
         with open('schema.sql', 'r') as f:
