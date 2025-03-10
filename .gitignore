@@ -27,12 +27,22 @@ ENV/
 
 # Environment Variables
 .env
+.env.*
+!.env.example
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# Logs
+*.log
+logs/
+
+# Database
+*.sqlite3
+*.db
 
 # OS
 .DS_Store
