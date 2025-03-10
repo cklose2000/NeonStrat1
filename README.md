@@ -77,7 +77,7 @@ NEON_PROJECT_ID=your_project_id
 
 5. Initialize the database:
 ```bash
-python init_db.py
+python scripts/init_db.py
 ```
 
 ## Usage
@@ -86,7 +86,7 @@ python init_db.py
 
 1. Run a simple backtest:
 ```bash
-python main.py
+python scripts/main.py
 ```
 
 This will:
@@ -131,16 +131,26 @@ session_id = simulator.run_backtest(
 
 ```
 NeonStrat1/
-├── src/
+├── data/                  # Market data files
+├── logs/                  # Log files (excluded from version control)
+├── schema/                # Database schema files
+│   └── schema.sql
+├── scripts/               # Utility scripts
+│   ├── init_db.py         # Database initialization
+│   ├── load_market_data.py # Load market data into the database
+│   ├── test_connection.py # Test database connection
+│   └── main.py            # Example usage
+├── src/                   # Source code
 │   ├── __init__.py
-│   ├── data_ingestion.py   # Data ingestion module
-│   ├── strategy.py         # Strategy implementations
-│   └── backtest.py        # Backtesting engine
-├── schema.sql             # Database schema
-├── init_db.py            # Database initialization
-├── main.py               # Example usage
-├── requirements.txt      # Project dependencies
-└── README.md            # This file
+│   ├── data_loader.py     # Data loader module
+│   ├── data_ingestion.py  # Data ingestion module
+│   ├── backtest.py        # Backtesting engine
+│   ├── strategy.py        # Strategy implementations
+│   └── db_connection.py   # Database connection management
+├── .env.example           # Environment variable template
+├── .gitignore             # Git ignore file
+├── README.md              # Project documentation
+└── requirements.txt       # Project dependencies
 ```
 
 ## Database Schema
